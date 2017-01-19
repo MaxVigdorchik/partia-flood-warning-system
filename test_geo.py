@@ -1,5 +1,6 @@
 import pytest
 import floodsystem.geo
+from floodsystem.geo import spherical_distance, stations_within_radius
 import numpy as np
 from floodsystem.stationdata import build_station_list
 
@@ -8,6 +9,13 @@ def test_haversine():
     """Unit tests for haversine"""
     assert floodsystem.geo.haversine(0) == 0
     assert round(floodsystem.geo.haversine(np.pi), 8) == 1
+
+
+def test_spherical_distance():
+    """Tests properties of distance like distance from point to itself is 0"""
+    assert spherical_distance((25, 25), (25, 25)) == 0
+    assert spherical_distance(
+        (1, 2), (2, 1)) == spherical_distance((2, 1), (1, 2))
 
 
 def test_stations_by_distance():
@@ -20,3 +28,10 @@ def test_stations_by_distance():
         station1, distance1 = mylist[i]
         station2, distance2 = mylist[i - 1]
         assert distance2 <= distance1
+
+
+def test_stations_within_radius():
+    """Tests a few edge cases (e.g. radius 0 or empty station list) for the stations within radius 
+    function"""
+    assert stations_within_radius([], (25, 25), 10) == []
+    assert stations_within_radius(build_station_list(), (50, 0), 0) == []
