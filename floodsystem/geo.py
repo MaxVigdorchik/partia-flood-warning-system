@@ -4,6 +4,7 @@ geographical data.
 """
 
 from .utils import sorted_by_key
+from .stationdata import build_station_list
 import numpy as np
 
 
@@ -12,13 +13,22 @@ def haversine(theta):
     return np.sin(theta / 2) * np.sin(theta / 2)
 
 
-def spherical_distance(lat1, lat2, lon1, lon2):
+def spherical_distance(p1, p2):  # gotta convert to radians
     """Returns the distance between two points (latitude,longitude) on the surface of a sphere in km"""
     r = 6356.752
-    h = haversine(lat2 - lat1) + np.cos(lat1) * \
-        np.cos(lat2) * haversine(lon2 - lon1)
+    h = haversine((p2[0] - p1[0]) * np.pi / 180) + np.cos(p1[0] * np.pi / 180) * \
+        np.cos(p2[0] * np.pi / 180) * haversine((p2[1] - p1[1]) * np.pi / 180)
     return 2 * r * np.arcsin(np.sqrt(h))
 
 
 def stations_by_distance(stations, p):
-    return ""
+    """Takes a list of stations and a point and returns a list of tuples 
+    (station, distance) where distance is there spherical distance of that station
+    to p
+    """
+    result = []
+    for station in stations:
+        distance = spherical_distance(station.coord, p)
+        result.append((station, distance))
+
+    return sorted_by_key(result, 1)
