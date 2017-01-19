@@ -18,3 +18,7 @@ def spherical_distance(lat1, lat2, lon1, lon2):
     h = haversine(lat2 - lat1) + np.cos(lat1) * \
         np.cos(lat2) * haversine(lon2 - lon1)
     return 2 * r * np.arcsin(np.sqrt(h))
+
+
+def stations_by_distance(stations, p):
+    return ""
