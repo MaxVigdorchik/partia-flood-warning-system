@@ -19,4 +19,4 @@ def test_stations_by_distance():
         # Not sure if python allows double indexing so I do this
         station1, distance1 = mylist[i]
         station2, distance2 = mylist[i - 1]
-        assert distance1 >= distance2
+        assert distance2 <= distance1
