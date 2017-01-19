@@ -1,11 +1,13 @@
 import pytest
 import floodsystem.geo
+import numpy as np
 from floodsystem.stationdata import build_station_list
 
 
 def test_haversine():
     """Unit tests for haversine"""
     assert floodsystem.geo.haversine(0) == 0
+    assert round(floodsystem.geo.haversine(np.pi), 8) == 1
 
 
 def test_stations_by_distance():
