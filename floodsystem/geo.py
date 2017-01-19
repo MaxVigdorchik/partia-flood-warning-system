@@ -22,7 +22,7 @@ def spherical_distance(p1, p2):  # gotta convert to radians
 
 
 def stations_by_distance(stations, p):
-    """Takes a list of stations and a point and returns a list of tuples 
+    """Takes a list of stations and a point and returns a list of tuples
     (station, distance) where distance is there spherical distance of that station
     to p
     """
@@ -32,3 +32,12 @@ def stations_by_distance(stations, p):
         result.append((station, distance))
 
     return sorted_by_key(result, 1)
+
+
+def stations_within_radius(stations, centre, r):
+    """ Takes a list of stations, a location, and a radius and returns
+    in no specific order a list of all of the stations within r
+    of centre
+    """
+    distances = stations_by_distance(stations, centre)
+    return [station_list for station_list, distance in distances if distance < r]
