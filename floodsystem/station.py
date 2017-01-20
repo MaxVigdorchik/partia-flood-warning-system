@@ -2,6 +2,7 @@
 for manipulating/modifying station data
 
 """
+import math
 
 
 class MonitoringStation:
@@ -40,11 +41,14 @@ class MonitoringStation:
         """Returns true if and only if the data in the station class meets certain consistency
         requirements including that typical highs are higher than lows and that data is available
         """
-        if not self.typical_range is None:
-            low, high = self.typical_range
-            return not (high < low)
-        else:
+        if self.typical_range is None:
             return False
+        if self.typical_range[0] is None or self.typical_range[1] is None:
+            return False
+        if math.isnan(self.typical_range[0]) or math.isnan(self.typical_range[1]):
+            return False
+        low, high = self.typical_range
+        return not (high < low)
 
 
 def inconsistent_typical_range_stations(stations):

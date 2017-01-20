@@ -3,6 +3,8 @@
 import pytest
 from floodsystem.station import MonitoringStation, inconsistent_typical_range_stations
 from floodsystem.stationdata import build_station_list
+from hypothesis import given
+import hypothesis.strategies as st
 
 
 def test_create_monitoring_station():
@@ -26,12 +28,13 @@ def test_create_monitoring_station():
     assert s.town == town
 
 
-def test_typical_range_consistent():
+@given(st.floats(), st.floats())
+def test_typical_range_consistent(a, b):
     """Tests the consistency tester function for the station class"""
     s1 = MonitoringStation(None, None, None, None, None, None, None)
-    s2 = MonitoringStation(None, None, None, None, (50, 40), None, None)
+    s2 = MonitoringStation(None, None, None, None, (a, b), None, None)
     assert s1.typical_range_consistent() == False
-    assert s2.typical_range_consistent() == False
+    assert s2.typical_range_consistent() == (b >= a)
 
     s_id = "test-s-id"
     m_id = "test-m-id"
