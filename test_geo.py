@@ -3,6 +3,9 @@ import floodsystem.geo
 from floodsystem.geo import spherical_distance, stations_within_radius, stations_by_distance, rivers_with_station, stations_by_river, rivers_by_station_number
 import numpy as np
 from floodsystem.stationdata import build_station_list
+from hypothesis import given, assume
+from hypothesis.strategies import floats
+import math
 
 
 def test_haversine():
@@ -30,11 +33,17 @@ def test_stations_by_distance():
         assert distance2 <= distance1
 
 
-def test_stations_within_radius():
-    """Tests a few edge cases (e.g. radius 0 or empty station list) for the stations within radius 
-    function"""
+@given(floats(), floats(min_value=-90, max_value=90), floats(min_value=-180, max_value=180))
+def test_stations_within_radius(r, lat, lon):
+    """Tests a few edge cases (e.g. radius 0 or empty station list) for the stations within radius
+    function. Also ensures randomly generated radii are obeyed by the results"""
+    assume(not (math.isnan(r) or math.isnan(lat) or math.isnan(lon)))
+
+    stations = build_station_list()
     assert stations_within_radius([], (25, 25), 10) == []
-    assert stations_within_radius(build_station_list(), (50, 0), 0) == []
+    assert stations_within_radius(stations, (50, 0), 0) == []
+    for s in stations_within_radius(stations, (lat, lon), r):
+        assert spherical_distance(s.coord, (lat, lon)) <= r
 
 def test_rivers_with_station():
     """Tests that the function has at least 800 rivers inc. Thames"""
