@@ -1,6 +1,6 @@
 import pytest
 import floodsystem.geo
-from floodsystem.geo import spherical_distance, stations_within_radius
+from floodsystem.geo import spherical_distance, stations_within_radius, stations_by_distance, rivers_with_station, stations_by_river
 import numpy as np
 from floodsystem.stationdata import build_station_list
 from hypothesis import given, assume
@@ -24,7 +24,7 @@ def test_spherical_distance():
 def test_stations_by_distance():
     """Ensures that stations are sorted correctly by distance"""
     stations = build_station_list()
-    mylist = floodsystem.geo.stations_by_distance(stations, (0, 0))
+    mylist = stations_by_distance(stations, (0, 0))
 
     for i in range(2, len(stations)):
         # Not sure if python allows double indexing so I do this
@@ -44,3 +44,17 @@ def test_stations_within_radius(r, lat, lon):
     assert stations_within_radius(stations, (50, 0), 0) == []
     for s in stations_within_radius(stations, (lat, lon), r):
         assert spherical_distance(s.coord, (lat, lon)) <= r
+
+def test_rivers_with_station():
+    """Tests that the function has at least 800 rivers inc. Thames"""
+    stations = build_station_list()
+    rivers=rivers_with_station(stations)
+    assert len(rivers)>=800 #number of rivers with station should be 843 as of 21/01/2017 but this may change so check it is above 800
+    assert "Thames" in rivers
+
+def test_stations_by_river():
+    """Check that certain stations are produced in the list for certain rivers"""
+    stations = build_station_list()
+    assert "Armley" in stations_by_river(stations, "River Aire")
+    assert "Benson Lock" in stations_by_river(stations, "Thames")
+    
