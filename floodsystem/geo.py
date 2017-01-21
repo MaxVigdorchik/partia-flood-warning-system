@@ -37,7 +37,7 @@ def stations_by_distance(stations, p):
 def stations_within_radius(stations, centre, r):
     """ Takes a list of stations, a location, and a radius and returns
     in no specific order a list of all of the stations within r
-    of centre
+    of centre. Latitudes and Longitudes are assumed to be valid as a precondition.
     """
     distances = stations_by_distance(stations, centre)
     return [station_list for station_list, distance in distances if distance < r]
