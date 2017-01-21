@@ -1,6 +1,6 @@
 import pytest
 import floodsystem.geo
-from floodsystem.geo import spherical_distance, stations_within_radius, stations_by_distance, rivers_with_station, stations_by_river
+from floodsystem.geo import spherical_distance, stations_within_radius, stations_by_distance, rivers_with_station, stations_by_river, rivers_by_station_number
 import numpy as np
 from floodsystem.stationdata import build_station_list
 
@@ -49,3 +49,12 @@ def test_stations_by_river():
     assert "Armley" in stations_by_river(stations, "River Aire")
     assert "Benson Lock" in stations_by_river(stations, "Thames")
     
+def test_rivers_by_station_number():
+    """Tests the length of a few outputs and checks order of rivers"""
+    stations = build_station_list()
+    #the length can be greater than the value of N if the next rivers have the same number of stations
+    assert len(rivers_by_station_number(stations, 1))>=1
+    assert len(rivers_by_station_number(stations, 10))>=10
+    assert len(rivers_by_station_number(stations, 30))>=30
+    biggest_river=rivers_by_station_number(stations, 1)
+    assert biggest_river[0][0]=="Thames"
