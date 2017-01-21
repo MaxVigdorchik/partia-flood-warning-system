@@ -44,6 +44,8 @@ def test_rivers_with_station():
     assert "Thames" in rivers
 
 def test_stations_by_river():
+    """Check that certain stations are produced in the list for certain rivers"""
     stations = build_station_list()
     assert "Armley" in stations_by_river(stations, "River Aire")
+    assert "Benson Lock" in stations_by_river(stations, "Thames")
     
