@@ -41,3 +41,23 @@ def stations_within_radius(stations, centre, r):
     """
     distances = stations_by_distance(stations, centre)
     return [station_list for station_list, distance in distances if distance < r]
+
+def rivers_with_station(stations):
+    """Takes a list of stations and returns a set of all the rivers
+    in alphabetic order upon which those stations are located"""
+    rivers=set()
+    for station in stations:
+        rivers.add(station.river)
+    rivers=sorted(rivers)
+    return rivers
+
+def stations_by_river(stations, river):
+    """Takes a list of stations and returns a list of all the station names
+    on a specific river in alphabetic order"""
+    station_names=[]
+    for station in stations:
+        if station.river==river:
+            station_names.append(station.name)
+    station_names=sorted(station_names)
+    return station_names
+        
