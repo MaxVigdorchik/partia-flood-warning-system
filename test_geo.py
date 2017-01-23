@@ -14,11 +14,17 @@ def test_haversine():
     assert round(floodsystem.geo.haversine(np.pi), 8) == 1
 
 
-def test_spherical_distance():
+@given(floats(min_value=-90, max_value=90), floats(min_value=-180, max_value=180),
+       floats(min_value=-90, max_value=90), floats(min_value=-180, max_value=180))
+def test_spherical_distance(lat1, lon1, lat2, lon2):
     """Tests properties of distance like distance from point to itself is 0"""
-    assert spherical_distance((25, 25), (25, 25)) == 0
-    assert spherical_distance(
-        (1, 2), (2, 1)) == spherical_distance((2, 1), (1, 2))
+    assume(not (math.isnan(lat1) or math.isnan(lon1)
+                or math.isnan(lat2) or math.isnan(lon2)))
+
+    assert spherical_distance((lat1, lon1), (lat1, lon1)) == 0
+    assert abs(
+        spherical_distance((lat1, lon1), (lat2, lon2)) -
+        spherical_distance((lat2, lon2), (lat1, lon1))) < 1e-6
 
 
 def test_stations_by_distance():
