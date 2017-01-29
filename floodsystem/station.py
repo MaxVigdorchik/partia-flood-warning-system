@@ -43,13 +43,22 @@ class MonitoringStation:
         """
         if self.typical_range is None:
             return False
+
+        # The Following if statement is probably not necessary as math.isnan
+        # covers it, but it does no harm.
+
         if self.typical_range[0] is None or self.typical_range[1] is None:
             return False
+
         if math.isnan(self.typical_range[0]) or math.isnan(self.typical_range[1]):
             return False
+
         low, high = self.typical_range
+        # Using this phrasing to make it more clear how consistency is being
+        # checked
         return not (high < low)
 
 
 def inconsistent_typical_range_stations(stations):
+    """Returns a list of all stations with inconsistent typical ranges"""
     return [s for s in stations if not s.typical_range_consistent()]
