@@ -28,13 +28,15 @@ class MonitoringStation:
         self.latest_level = None
 
     def __repr__(self):
-        d = "Station name:     {}\n".format(self.name)
+        d = "Station name:    {}\n".format(self.name)
         d += "   id:            {}\n".format(self.station_id)
-        d += " measure id: {}\n".format(self.measure_id)
+        d += "   measure id:    {}\n".format(self.measure_id)
         d += "   coordinate:    {}\n".format(self.coord)
         d += "   town:          {}\n".format(self.town)
         d += "   river:         {}\n".format(self.river)
-        d += "   typical range: {}".format(self.typical_range)
+        d += "   typical range: {}\n".format(self.typical_range)
+        d += "   latest level:  {}".format(self.latest_level)
+        
         return d
 
     def typical_range_consistent(self):
@@ -57,6 +59,22 @@ class MonitoringStation:
         # Using this phrasing to make it more clear how consistency is being
         # checked
         return not (high < low)
+
+    def relative_water_level(self):
+        """Returns the latest water level as a fraction of the typical range, and returns None if data 
+        not available"""
+        
+        #use another method to only define a relative level if typical values are consistent
+        if self.typical_range_consistent()==True:
+            
+            #the following raises an exception if latestlevel is None
+            try:
+                relative_level=(self.latest_level-self.typical_range[0])/(self.typical_range[1]-self.typical_range[0])
+            except:
+                relative_level=None
+        else:
+            relative_level=None
+        return relative_level
 
 
 def inconsistent_typical_range_stations(stations):
