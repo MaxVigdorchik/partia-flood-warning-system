@@ -21,7 +21,6 @@ def run():
     #This is necessary as we need the measure_id
     flooded_stations=[]
     for station_tuple in flooded_stations_tuples:
-        print(station_tuple)
         for station in stations:
             if station.name == station_tuple[0]:
                 flooded_stations.append(station)
