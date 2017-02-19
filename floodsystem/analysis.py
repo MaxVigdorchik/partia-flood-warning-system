@@ -2,8 +2,8 @@ import dateutil.parser
 import datetime
 import numpy as np
 from .stationdata import build_station_list
-import floodsystem.geo
 import matplotlib
+import matplotlib.dates
 import scipy as sp
 
 
@@ -15,7 +15,6 @@ def polyfit(dates, levels, p):
     times = matplotlib.dates.date2num(dates)
     d0 = np.min(times)
     times = times - d0
-
     poly = np.poly1d(np.polyfit(times, levels, p))
 
     return poly, d0
