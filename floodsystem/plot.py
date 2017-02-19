@@ -5,8 +5,8 @@ import dateutil.parser
 import datetime
 import numpy as np
 from .stationdata import build_station_list
-from .analsys import polyfit
-import geo
+from .analysis import polyfit
+import floodsystem.geo
 import matplotlib
 import scipy as sp
 

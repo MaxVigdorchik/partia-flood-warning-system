@@ -2,7 +2,7 @@ import dateutil.parser
 import datetime
 import numpy as np
 from .stationdata import build_station_list
-import geo
+import floodsystem.geo
 import matplotlib
 import scipy as sp
 
