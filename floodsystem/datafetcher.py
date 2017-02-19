@@ -130,6 +130,10 @@ def fetch_measure_levels(measure_id, dt):
 
         # Append data
         dates.append(d)
-        levels.append(measure['value'])
+        # Sometimes the value is missing. In this case skip it
+        try:
+            levels.append(measure['value'])
+        except:
+            levels.append(None)
 
     return dates, levels
