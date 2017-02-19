@@ -13,17 +13,23 @@ def run():
 
     stations=build_station_list()
     update_water_levels(stations)
+
+    #build list of tuples of looded stations
     flooded_stations_tuples=stations_highest_rel_level(stations, N)
 
     #the following essentially converts the list of tuples into a list of stations.
     #This is necessary as we need the measure_id
     flooded_stations=[]
-    for station in stations:
-        for flooded_station in flooded_stations_tuples:
-            if flooded_station[0]==station.name:
+    for station_tuple in flooded_stations_tuples:
+        print(station_tuple)
+        for station in stations:
+            if station.name == station_tuple[0]:
                 flooded_stations.append(station)
-                
+                break
+
     print(flooded_stations)
+
+    #plot data for each station            
     for station in flooded_stations:
         dates,levels=fetch_measure_levels(station.measure_id, timedelta(days=dt))
         plot_water_levels(station, dates,levels)
