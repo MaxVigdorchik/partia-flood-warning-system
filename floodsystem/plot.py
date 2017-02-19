@@ -1,14 +1,19 @@
-<<<<<<< HEAD
 """This module contains functions which create plots of river level data"""
 
 import matplotlib.pyplot as plt
+import dateutil.parser
+import datetime
+import numpy as np
+from .stationdata import build_station_list
+from .analsys import polyfit
+import geo
+import matplotlib
+import scipy as sp
 
 def plot_water_levels(station, dates, levels):
     """Takes an input of dates and water levels and plots both on a graph.
     Also shows the typical high and low for the station on the same graph.
     Does not show the graph."""
-
-    print(levels)
     
     # Plot
     plt.plot(dates, levels, label="$water levels$")
@@ -26,17 +31,6 @@ def plot_water_levels(station, dates, levels):
     # Display stuff
     plt.tight_layout()  # This makes sure plot does not cut off date labels
     plt.legend(loc=2) #move labels to upper left
-=======
-import dateutil.parser
-import datetime
-import numpy as np
-from .stationdata import build_station_list
-from .analsys import polyfit
-import geo
-import matplotlib
-import scipy as sp
-import matplotlib.pyplot as plt
-
 
 def plot_water_level_with_fit(station, dates, levels, p):
     """Plots the historical water levels of station given by dates and levels.
@@ -49,4 +43,3 @@ def plot_water_level_with_fit(station, dates, levels, p):
     y = best_fit(x - offset)
     plt.plot(dates, y)
     plt.title('Station Levels Best Fit')
->>>>>>> c244eb9bf00ad605fbe6231b49ee8194c72a8095
