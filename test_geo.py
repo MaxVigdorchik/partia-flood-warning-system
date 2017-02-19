@@ -51,25 +51,31 @@ def test_stations_within_radius(r, lat, lon):
     for s in stations_within_radius(stations, (lat, lon), r):
         assert spherical_distance(s.coord, (lat, lon)) <= r
 
+
 def test_rivers_with_station():
     """Tests that the function has at least 800 rivers inc. Thames"""
     stations = build_station_list()
-    rivers=rivers_with_station(stations)
-    assert len(rivers)>=800 #number of rivers with station should be 843 as of 21/01/2017 but this may change so check it is above 800
+    rivers = rivers_with_station(stations)
+    # number of rivers with station should be 843 as of 21/01/2017 but this
+    # may change so check it is above 800
+    assert len(rivers) >= 800
     assert "Thames" in rivers
+
 
 def test_stations_by_river():
     """Check that certain stations are produced in the list for certain rivers"""
     stations = build_station_list()
     assert "Armley" in stations_by_river(stations, "River Aire")
     assert "Benson Lock" in stations_by_river(stations, "Thames")
-    
+
+
 def test_rivers_by_station_number():
     """Tests the length of a few outputs and checks order of rivers"""
     stations = build_station_list()
-    #the length can be greater than the value of N if the next rivers have the same number of stations
-    assert len(rivers_by_station_number(stations, 1))>=1
-    assert len(rivers_by_station_number(stations, 10))>=10
-    assert len(rivers_by_station_number(stations, 30))>=30
-    biggest_river=rivers_by_station_number(stations, 1)
-    assert biggest_river[0][0]=="Thames"
+    # the length can be greater than the value of N if the next rivers have
+    # the same number of stations
+    assert len(rivers_by_station_number(stations, 1)) >= 1
+    assert len(rivers_by_station_number(stations, 10)) >= 10
+    assert len(rivers_by_station_number(stations, 30)) >= 30
+    biggest_river = rivers_by_station_number(stations, 1)
+    assert biggest_river[0][0] == "Thames"

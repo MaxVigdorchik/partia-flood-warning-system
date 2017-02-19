@@ -2,7 +2,7 @@ import dateutil.parser
 import datetime
 import numpy as np
 from .stationdata import build_station_list
-from .analsys import polyfit
+from .analysis import polyfit
 import geo
 import matplotlib
 import scipy as sp
