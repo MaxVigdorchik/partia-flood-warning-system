@@ -45,5 +45,5 @@ def plot_water_level_with_fit(station, dates, levels, p):
 
     x = matplotlib.dates.date2num(dates)
     y = best_fit(x - offset)
-    plt.plot(dates, y)
-    plt.title('Station Levels Best Fit')
+    plt.plot(dates, y, label="$Best Fit$")
+    plt.legend(loc=2)
