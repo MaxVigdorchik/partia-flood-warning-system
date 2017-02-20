@@ -6,9 +6,8 @@ latest time history level data
 import os
 import json
 import requests
-
+from datetime import datetime, timedelta
 import dateutil.parser
-import datetime
 
 
 def fetch(url):
@@ -107,9 +106,11 @@ def fetch_measure_levels(measure_id, dt):
     dt. Return list of dates and a list of values.
 
     """
-
+    # Convert integer dt into correct format: ~Ben
+    dt=timedelta(days=dt)
+    
     # Current time (UTC)
-    now = datetime.datetime.utcnow()
+    now = datetime.utcnow()
 
     # Start time for data
     start = now - dt
@@ -130,7 +131,7 @@ def fetch_measure_levels(measure_id, dt):
 
         # Append data
         dates.append(d)
-        # Sometimes the value is missing. In this case skip it
+        # Sometimes the value is missing. In this case skip it ~Ben
         try:
             levels.append(measure['value'])
         except:

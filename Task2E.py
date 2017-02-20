@@ -1,7 +1,6 @@
 from floodsystem.datafetcher import fetch_measure_levels
 from floodsystem.stationdata import build_station_list, update_water_levels
 from floodsystem.plot import plot_water_levels
-from datetime import datetime, timedelta
 from floodsystem.flood import stations_highest_rel_level
 import matplotlib.pyplot as plt
 
@@ -30,7 +29,7 @@ def run():
 
     #plot data for each station            
     for station in flooded_stations:
-        dates,levels=fetch_measure_levels(station.measure_id, timedelta(days=dt))
+        dates,levels=fetch_measure_levels(station.measure_id, dt)
         plot_water_levels(station, dates,levels)
         plt.show()
     
