@@ -36,7 +36,7 @@ class MonitoringStation:
         d += "   river:         {}\n".format(self.river)
         d += "   typical range: {}\n".format(self.typical_range)
         d += "   latest level:  {}".format(self.latest_level)
-        
+
         return d
 
     def typical_range_consistent(self):
@@ -63,17 +63,19 @@ class MonitoringStation:
     def relative_water_level(self):
         """Returns the latest water level as a fraction of the typical range, and returns None if data 
         not available"""
-        
-        #use another method to only define a relative level if typical values are consistent
-        if self.typical_range_consistent()==True:
-            
-            #the following raises an exception if latestlevel is None
+
+        # use another method to only define a relative level if typical values
+        # are consistent
+        if self.typical_range_consistent() == True:
+
+            # the following raises an exception if latestlevel is None
             try:
-                relative_level=(self.latest_level-self.typical_range[0])/(self.typical_range[1]-self.typical_range[0])
+                relative_level = (self.latest_level - self.typical_range[0]) / (
+                    self.typical_range[1] - self.typical_range[0])
             except:
-                relative_level=None
+                relative_level = None
         else:
-            relative_level=None
+            relative_level = None
         return relative_level
 
 

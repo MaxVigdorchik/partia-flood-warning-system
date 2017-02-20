@@ -1,10 +1,38 @@
 import dateutil.parser
 import datetime
 import numpy as np
-from .stationdata import build_station_list
+from .stationdata import build_station_list, update_water_levels
+from .datafetcher import fetch_measure_levels
 import matplotlib
 import matplotlib.dates
 import scipy as sp
+import scipy.misc
+
+
+def issue_warnings(p=4, dt=10):
+    """Returns a list of all stations alongside an assesment of their flood warning risk 
+    based on their current and historical water levels. Uses a polynomial of degree p for estimation
+    with a history of dt days."""
+    stations = build_station_list()
+    update_water_levels(stations)
+    stations_by_risk = []
+
+    for s in stations:
+        if not s.typical_range_consistent():
+            pass
+
+        dates, levels = fetch_measure_levels(
+            s.measure_id, dt=datetime.timedelta(days=dt))
+        times = matplotlib.date.date2num(dates)
+        # f is a function representing water levels over time, and its
+        # derivatives are computed.
+        f, offset = polyfit(dates, levels, p)
+        df = f.deriv()
+        d2f = f.deriv(2)
+        rel_level = s.relative_water_level()
+        # TODO: Use the derivatives to score each stations risk, and then
+        # assign a severity either based on absolute values or relative to
+        # other stations.
 
 
 def polyfit(dates, levels, p):
