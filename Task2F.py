@@ -22,7 +22,7 @@ def run():
 
     for station in risky_stations:
         dates, levels = fetch_measure_levels(
-            station.measure_id, dt=DT)
+            station.measure_id, dt=datetime.timedelta(days=DT))
         plot_water_level_with_fit(station, dates, levels, p)
         plt.show()
 

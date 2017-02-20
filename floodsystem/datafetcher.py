@@ -107,8 +107,9 @@ def fetch_measure_levels(measure_id, dt):
 
     """
     # Convert integer dt into correct format: ~Ben
-    dt=timedelta(days=dt)
-    
+    # This change has caused me a lot of headaches, please for the love of god dont do this again ~Max
+    # dt=timedelta(days=dt)
+
     # Current time (UTC)
     now = datetime.utcnow()
 
