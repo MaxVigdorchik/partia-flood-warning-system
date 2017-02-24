@@ -1,4 +1,4 @@
-from floodsystem.analysis import polyfit, Bernstein
+from floodsystem.analysis import polyfit
 import numpy as np
 import datetime
 import pytest

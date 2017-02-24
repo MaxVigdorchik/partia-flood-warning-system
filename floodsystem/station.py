@@ -40,13 +40,17 @@ class MonitoringStation:
         return d
 
     def typical_range_consistent(self):
-        """Returns true if and only if the data in the station class meets certain consistency
+        """returns true if and only if the data in the station class meets certain consistency
         requirements including that typical highs are higher than lows and that data is available
+        also checks if latest level is consistent to save a lot of other code
         """
         if self.typical_range is None:
             return False
 
-        # The Following if statement is probably not necessary as math.isnan
+        if self.latest_level is None:
+            return False
+
+        # the following if statement is probably not necessary as math.isnan
         # covers it, but it does no harm.
 
         if self.typical_range[0] is None or self.typical_range[1] is None:
@@ -56,7 +60,7 @@ class MonitoringStation:
             return False
 
         low, high = self.typical_range
-        # Using this phrasing to make it more clear how consistency is being
+        # using this phrasing to make it more clear how consistency is being
         # checked
         return not (high < low)
 
@@ -66,14 +70,15 @@ class MonitoringStation:
 
         # use another method to only define a relative level if typical values
         # are consistent
-        if self.typical_range_consistent() == True:
+        if self.typical_range_consistent():
 
             # the following raises an exception if latestlevel is None
-            try:
-                relative_level = (self.latest_level - self.typical_range[0]) / (
-                    self.typical_range[1] - self.typical_range[0])
-            except:
-                relative_level = None
+            # AND IF ANYTHING ELSE GOES WRONG SUCH AS THE FUNCTION NOT WORKING.
+            # try:
+            relative_level = (self.latest_level - self.typical_range[0]) / (
+                self.typical_range[1] - self.typical_range[0])
+            # except:
+            #    relative_level = None
         else:
             relative_level = None
         return relative_level

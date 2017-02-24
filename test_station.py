@@ -2,7 +2,7 @@
 
 import pytest
 from floodsystem.station import MonitoringStation, inconsistent_typical_range_stations
-from floodsystem.stationdata import build_station_list
+from floodsystem.stationdata import build_station_list, update_water_levels
 from hypothesis import given
 import hypothesis.strategies as st
 
@@ -28,13 +28,15 @@ def test_create_monitoring_station():
     assert s.town == town
 
 
-@given(st.floats(), st.floats())
-def test_typical_range_consistent(a, b):
+def test_typical_range_consistent():
     """Tests the consistency tester function for the station class"""
     s1 = MonitoringStation(None, None, None, None, None, None, None)
-    s2 = MonitoringStation(None, None, None, None, (a, b), None, None)
+    stations = build_station_list()
+    update_water_levels(stations)
     assert s1.typical_range_consistent() == False
-    assert s2.typical_range_consistent() == (b >= a)
+    for s in stations:
+        if s.typical_range_consistent():
+            assert (s.typical_range[1] >= s.typical_range[0])
 
     s_id = "test-s-id"
     m_id = "test-m-id"
@@ -44,7 +46,8 @@ def test_typical_range_consistent(a, b):
     river = "River X"
     town = "My Town"
     s3 = MonitoringStation(s_id, m_id, label, coord, trange, river, town)
-    assert s3.typical_range_consistent() == True
+    # False only because of my new relative level requirement
+    assert s3.typical_range_consistent() == False
 
 
 def test_inconsistent_typical_range_stations():
