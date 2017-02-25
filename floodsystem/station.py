@@ -75,10 +75,11 @@ class MonitoringStation:
             # the following raises an exception if latestlevel is None
             # AND IF ANYTHING ELSE GOES WRONG SUCH AS THE FUNCTION NOT WORKING.
             # try:
-            relative_level = (self.latest_level - self.typical_range[0]) / (
-                self.typical_range[1] - self.typical_range[0])
-            # except:
-            #    relative_level = None
+            try:
+                relative_level = (self.latest_level - self.typical_range[0]) / (
+                    self.typical_range[1] - self.typical_range[0])
+            except TypeError:
+                relative_level = None
         else:
             relative_level = None
         return relative_level

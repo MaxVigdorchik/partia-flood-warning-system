@@ -10,11 +10,12 @@ from .station import inconsistent_typical_range_stations
 from .flood import stations_level_over_threshold
 import matplotlib
 import matplotlib.dates
+import concurrent.futures as cf
 import scipy as sp
 import scipy.misc
 
 
-def issue_warnings(stations, p=4, dt=10):
+def issue_warnings(stations, p=1, dt=10):
     """Returns a list of all stations alongside an assesment of their flood warning risk
     based on their current and historical water levels. Uses a polynomial of degree p for estimation
     with a history of dt days. The return value is given as (station, risk_value, risk) where risk
@@ -25,14 +26,15 @@ def issue_warnings(stations, p=4, dt=10):
     # generate risk_value
 
     # Define (low, moderate, high, severe) risk values
-    def risk_definition(risk_value):
+    def risk_definition(risk):
         boundaries = (0, 0.8, 1.5, 2)
-
-        if risk_value < boundaries[1]:
+        if risk is None:
+            return "unknown"
+        if risk < boundaries[1]:
             return "low"
-        if risk_value < boundaries[2]:
+        if risk < boundaries[2]:
             return "moderate"
-        if risk_value < boundaries[3]:
+        if risk < boundaries[3]:
             return "high"
         return "severe"
 
@@ -46,10 +48,14 @@ def issue_warnings(stations, p=4, dt=10):
     unsafe_stations = stations_level_over_threshold(
         stations, 0.8)  # Tol is for moderate risk stations or higher
 
+    def loop_operation(station):
+
     for s in stations:
+        if s.relative_water_level() is None:  # Avoid Pesky nonetypes always appearing
+            pass
         if s in inconsistent_stations:
             pass
-        if (not s in unsafe_stations) and (not s in inconsistent_stations):
+        if (s not in unsafe_stations):
             stations_by_risk.append(
                 (s, s.relative_water_level(), risk_definition(s.relative_water_level())))
             pass  # save time computing fairly safe stations
@@ -58,9 +64,14 @@ def issue_warnings(stations, p=4, dt=10):
             s.measure_id, dt=datetime.timedelta(days=dt))
         times = matplotlib.dates.date2num(dates)
         # So simple operations can be done on the list
-        levels = np.array(levels)
-        levels = (levels - s.typical_range[0]) / (
-            s.typical_range[1] - s.typical_range[0])
+        try:
+            levels = np.array(levels)
+            levels = (levels - s.typical_range[0]) / (
+                s.typical_range[1] - s.typical_range[0])
+        except (TypeError, ValueError):  # For the random list in relative levels that appears
+            inconsistent_stations.append(s)
+            pass
+
         # Converts the levels to relative levels before polynomial fitting
         # since the values are more useful as relative levels.
 
@@ -68,16 +79,23 @@ def issue_warnings(stations, p=4, dt=10):
         # derivatives are computed. The rest are other useful values
         try:
             f, offset = polyfit(dates, levels, p)
-        except:  # in case of weird empty arrays, shouldnt be happening
+            latest_time = times[-1] - offset
+        # in case of weird empty arrays, shouldnt be happening
+        except (IndexError, ValueError, TypeError):
+            inconsistent_stations.append(s)  # make sure to consider it later
             pass
-        latest_time = times[-1] - offset
         df = f.deriv()
         d2f = f.deriv(2)
 
-        risk_value = f(latest_time)
-        risk_value += df(latest_time) * dweight
-        risk_value += d2f(latest_time) * d2weight
-        stations_by_risk.append((s, risk_value, risk_definition(risk_value)))
+        try:
+            risk_value = f(latest_time)
+            risk_value += df(latest_time) * dweight
+            risk_value += d2f(latest_time) * d2weight
+            stations_by_risk.append(
+                (s, risk_value, risk_definition(risk_value)))
+        except:
+            inconsistent_stations.append(s)
+            pass
         if (not s.river in risk_of_rivers.keys()) or (risk_value > risk_of_rivers[s.river]):
             risk_of_rivers[s.river] = risk_value
 
