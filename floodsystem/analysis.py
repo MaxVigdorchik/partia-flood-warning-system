@@ -10,7 +10,6 @@ from .station import inconsistent_typical_range_stations
 from .flood import stations_level_over_threshold
 import matplotlib
 import matplotlib.dates
-import concurrent.futures as cf
 import scipy as sp
 import scipy.misc
 
@@ -25,8 +24,12 @@ def issue_warnings(stations, p=1, dt=10):
     # TODO: Future addition could use some form of machine learning to
     # generate risk_value
 
+    # I messed up writing this code confusing pass with continue, so a lot of
+    # it is totally unecessary but I am not sure what parts.
+
     # Define (low, moderate, high, severe) risk values
     def risk_definition(risk):
+        """Helper Function to define what different risks mean"""
         boundaries = (0, 0.8, 1.5, 2)
         if risk is None:
             return "unknown"
@@ -48,17 +51,15 @@ def issue_warnings(stations, p=1, dt=10):
     unsafe_stations = stations_level_over_threshold(
         stations, 0.8)  # Tol is for moderate risk stations or higher
 
-    def loop_operation(station):
-
     for s in stations:
         if s.relative_water_level() is None:  # Avoid Pesky nonetypes always appearing
-            pass
+            continue
         if s in inconsistent_stations:
-            pass
+            continue
         if (s not in unsafe_stations):
             stations_by_risk.append(
                 (s, s.relative_water_level(), risk_definition(s.relative_water_level())))
-            pass  # save time computing fairly safe stations
+            continue  # save time computing fairly safe stations
 
         dates, levels = fetch_measure_levels(
             s.measure_id, dt=datetime.timedelta(days=dt))
@@ -70,7 +71,7 @@ def issue_warnings(stations, p=1, dt=10):
                 s.typical_range[1] - s.typical_range[0])
         except (TypeError, ValueError):  # For the random list in relative levels that appears
             inconsistent_stations.append(s)
-            pass
+            continue
 
         # Converts the levels to relative levels before polynomial fitting
         # since the values are more useful as relative levels.
@@ -83,25 +84,31 @@ def issue_warnings(stations, p=1, dt=10):
         # in case of weird empty arrays, shouldnt be happening
         except (IndexError, ValueError, TypeError):
             inconsistent_stations.append(s)  # make sure to consider it later
-            pass
+            continue
         df = f.deriv()
         d2f = f.deriv(2)
 
-        try:
-            risk_value = f(latest_time)
-            risk_value += df(latest_time) * dweight
-            risk_value += d2f(latest_time) * d2weight
-            stations_by_risk.append(
-                (s, risk_value, risk_definition(risk_value)))
-        except:
+        risk_value = f(latest_time)
+        risk_value += df(latest_time) * dweight
+        risk_value += d2f(latest_time) * d2weight
+        stations_by_risk.append(
+            (s, risk_value, risk_definition(risk_value)))
+
+        if risk_value is None:  # Some weird stuff is happening with risk_value
             inconsistent_stations.append(s)
-            pass
+            continue
+
         if (not s.river in risk_of_rivers.keys()) or (risk_value > risk_of_rivers[s.river]):
             risk_of_rivers[s.river] = risk_value
 
+        print(risk_value)
+
     for s in inconsistent_stations:
-        stations_by_risk.append(
-            (s, risk_of_rivers[s.river], risk_definition(risk_of_rivers[s.river])))
+        if s.river in risk_of_rivers.keys():
+            stations_by_risk.append(
+                (s, risk_of_rivers[s.river], risk_definition(risk_of_rivers[s.river])))
+        else:
+            stations_by_risk.append((s, 0, risk_definition(0)))
 
     return sorted_by_key(stations_by_risk, 1, reverse=True)
 
