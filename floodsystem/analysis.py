@@ -14,7 +14,7 @@ import scipy as sp
 import scipy.misc
 
 
-def issue_warnings(stations, p=1, dt=10):
+def issue_warnings(stations, p=4, dt=10):
     """Returns a list of all stations alongside an assesment of their flood warning risk
     based on their current and historical water levels. Uses a polynomial of degree p for estimation
     with a history of dt days. The return value is given as (station, risk_value, risk) where risk
@@ -42,21 +42,22 @@ def issue_warnings(stations, p=1, dt=10):
         return "severe"
 
     # Defines how much derivatives of the level matter
-    dweight, d2weight = (0.5, 0.25)
+    dweight, d2weight = (5, 0.1)
 
     stations_by_risk = []
     # store maximum risk of each river for benefit of inconsistent stations
     risk_of_rivers = {}
     inconsistent_stations = inconsistent_typical_range_stations(stations)
-    unsafe_stations = stations_level_over_threshold(
+    # Get all the unsafe stations
+    unsafe_stations_name = stations_level_over_threshold(
         stations, 0.8)  # Tol is for moderate risk stations or higher
+    unsafe_stations = [s for s in stations for name,
+                       level in unsafe_stations_name if s.name == name]
 
     for s in stations:
-        if s.relative_water_level() is None:  # Avoid Pesky nonetypes always appearing
-            continue
         if s in inconsistent_stations:
             continue
-        if (s not in unsafe_stations):
+        if s not in unsafe_stations:
             stations_by_risk.append(
                 (s, s.relative_water_level(), risk_definition(s.relative_water_level())))
             continue  # save time computing fairly safe stations
@@ -87,27 +88,26 @@ def issue_warnings(stations, p=1, dt=10):
             continue
         df = f.deriv()
         d2f = f.deriv(2)
-
         risk_value = f(latest_time)
         risk_value += df(latest_time) * dweight
         risk_value += d2f(latest_time) * d2weight
-        stations_by_risk.append(
-            (s, risk_value, risk_definition(risk_value)))
-
+        if risk_value < s.relative_water_level():
+            # This just prevents strange  results, like a safety factor
+            risk_value = s.relative_water_level()
         if risk_value is None:  # Some weird stuff is happening with risk_value
             inconsistent_stations.append(s)
             continue
 
+        stations_by_risk.append(
+            (s, risk_value, risk_definition(risk_value)))
+
         if (not s.river in risk_of_rivers.keys()) or (risk_value > risk_of_rivers[s.river]):
             risk_of_rivers[s.river] = risk_value
-
-        print(risk_value)
-
-    for s in inconsistent_stations:
-        if s.river in risk_of_rivers.keys():
-            stations_by_risk.append(
-                (s, risk_of_rivers[s.river], risk_definition(risk_of_rivers[s.river])))
         else:
+            # This is because some rivers never got added in the previous
+            # section. This only happens if the river is safe or there is no
+            # available data at all for the river, so it is just marked as low
+            # risk
             stations_by_risk.append((s, 0, risk_definition(0)))
 
     return sorted_by_key(stations_by_risk, 1, reverse=True)

@@ -20,7 +20,8 @@ def run():
     stations_by_risk = issue_warnings(stations)
 
     for s, riskv, risk in stations_by_risk:
-        print((s.name, riskv, risk), "\n")
+        if risk == "severe" or risk == "high":
+            print((s.name, riskv, risk), "\n")
 
 if __name__ == "__main__":
     print("*** Task 2G: CUED Part IA Flood Warning System *** \n")

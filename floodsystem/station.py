@@ -50,6 +50,9 @@ class MonitoringStation:
         if self.latest_level is None:
             return False
 
+        if not isinstance(self.latest_level, float):
+            return False  # For the random stations that have a list as latest level
+
         # the following if statement is probably not necessary as math.isnan
         # covers it, but it does no harm.
 
@@ -78,7 +81,7 @@ class MonitoringStation:
             try:
                 relative_level = (self.latest_level - self.typical_range[0]) / (
                     self.typical_range[1] - self.typical_range[0])
-            except TypeError:
+            except:
                 relative_level = None
         else:
             relative_level = None
