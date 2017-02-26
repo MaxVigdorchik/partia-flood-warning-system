@@ -47,12 +47,6 @@ class MonitoringStation:
         if self.typical_range is None:
             return False
 
-        if self.latest_level is None:
-            return False
-
-        if not isinstance(self.latest_level, float):
-            return False  # For the random stations that have a list as latest level
-
         # the following if statement is probably not necessary as math.isnan
         # covers it, but it does no harm.
 
@@ -86,6 +80,18 @@ class MonitoringStation:
         else:
             relative_level = None
         return relative_level
+
+    def latest_level_consistent(self):
+        """Function to deal with weird cases such as latest level being a list, 
+        also just checks that update water levels went correctly for the latest level"""
+        if self.latest_level is None:
+            return False
+
+        if not isinstance(self.latest_level, float):
+            return False  # For the random stations that have a list as latest
+            level
+
+        return True
 
 
 def inconsistent_typical_range_stations(stations):

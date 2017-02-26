@@ -33,6 +33,8 @@ def run():
     for station in flooded_stations:
         dates, levels = fetch_measure_levels(
             station.measure_id, dt=datetime.timedelta(days=dt))
+        if len(dates) == 0 or len(levels) == 0:
+            continue  # Test for the stations with incorrect datafetcher responses
         plot_water_levels(station, dates, levels)
         plt.show()
 

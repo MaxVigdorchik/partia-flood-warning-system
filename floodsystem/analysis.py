@@ -57,6 +57,9 @@ def issue_warnings(stations, p=4, dt=10):
     for s in stations:
         if s in inconsistent_stations:
             continue
+        if not s.latest_level_consistent():
+            inconsistent_stations.append(s)
+            continue
         if s not in unsafe_stations:
             stations_by_risk.append(
                 (s, s.relative_water_level(), risk_definition(s.relative_water_level())))
@@ -82,9 +85,10 @@ def issue_warnings(stations, p=4, dt=10):
         try:
             f, offset = polyfit(dates, levels, p)
             latest_time = times[-1] - offset
-        # in case of weird empty arrays, shouldnt be happening
+        # in case of weird empty arrays, this wont happen if new fixed code is
+        # added for the datafetcher functions.
         except (IndexError, ValueError, TypeError):
-            inconsistent_stations.append(s)  # make sure to consider it later
+            inconsistent_stations.append(s)
             continue
         df = f.deriv()
         d2f = f.deriv(2)
@@ -92,7 +96,7 @@ def issue_warnings(stations, p=4, dt=10):
         risk_value += df(latest_time) * dweight
         risk_value += d2f(latest_time) * d2weight
         if risk_value < s.relative_water_level():
-            # This just prevents strange  results, like a safety factor
+            # This just prevents strange results, like a safety factor
             risk_value = s.relative_water_level()
         if risk_value is None:  # Some weird stuff is happening with risk_value
             inconsistent_stations.append(s)

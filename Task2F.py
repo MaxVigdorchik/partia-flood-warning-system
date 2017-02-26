@@ -23,6 +23,8 @@ def run():
     for station in risky_stations:
         dates, levels = fetch_measure_levels(
             station.measure_id, dt=datetime.timedelta(days=DT))
+        if len(dates) == 0 or len(levels) == 0:
+            continue  # Deal with empty lists appearing
         plot_water_level_with_fit(station, dates, levels, p)
         plt.show()
 
