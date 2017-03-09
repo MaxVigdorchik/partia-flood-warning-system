@@ -52,10 +52,10 @@ class Station_Risk(Resource):
                     d['risk'] = risk
                     d['risk_value'] = riskv
 
-        return {'Warning list': dictionary}
+        return {'stations': dictionary}
 
-api.add_resource(Station_json, '/stationlist')
-api.add_resource(Station_Risk, '/floodwarning')
+api.add_resource(Station_json, '/floodwarning/stationlist')
+api.add_resource(Station_Risk, '/floodwarning/risks')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0')
